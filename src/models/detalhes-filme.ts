@@ -1,5 +1,5 @@
 export class DetalhesFilme {
-  id: number;
+  id: string;
   titulo: string;
   sinopse: string;
   dataLancamento: string;
@@ -12,7 +12,7 @@ export class DetalhesFilme {
 
   generos: string[];
 
-  constructor(id: number, titulo: string, sinopse: string, dataLancamento: string, urlPoster: string,  urlSlide: string, mediaNota: number, contagemVotos: number, generos: string[]) {
+  constructor(id: string, titulo: string, sinopse: string, dataLancamento: string, urlPoster: string,  urlSlide: string, mediaNota: number, contagemVotos: number, generos: string[]) {
     this.id = id;
     this.titulo = titulo;
     this.sinopse = sinopse;

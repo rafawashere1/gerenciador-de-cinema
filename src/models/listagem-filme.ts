@@ -1,5 +1,5 @@
 export class ListagemFilme {
-  id: number;
+  id: string;
   titulo: string;
   sinopse: string;
   urlPoster: string;
@@ -7,7 +7,7 @@ export class ListagemFilme {
 
   readonly urlDetalhes: string;
 
-  constructor(id: number, titulo: string, sinopse: string, urlPoster: string, urlSlide: string) {
+  constructor(id: string, titulo: string, sinopse: string, urlPoster: string, urlSlide: string) {
     this.id = id;
     this.titulo = titulo;
     this.sinopse = sinopse;

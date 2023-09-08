@@ -1,4 +1,5 @@
 import { API_KEY } from "../../secrets";
+import { CreditosFilme } from "../models/creditos-filme";
 import { DetalhesFilme } from "../models/detalhes-filme";
 import { ListagemFilme } from "../models/listagem-filme";
 import { TrailerFilme } from "../models/trailer-filme";
@@ -13,20 +14,28 @@ export class FilmeService {
       .then((obj) => this.mapearFilmes(obj.results));
   }
 
-  selecionarDetalhesFilmePorId(id: number): Promise<DetalhesFilme> {
-    const url = `https://api.themoviedb.org/3/movie/${id}`;
+  selecionarDetalhesFilmePorId(id: string): Promise<DetalhesFilme> {
+    const url = `https://api.themoviedb.org/3/movie/${id}?language=pt-BR`;
 
     return fetch(url, this.obterHeaderAutorizacao())
       .then((res) => this.processarResposta(res))
-      .then((obj) => this.mapearDetalhesFilme(obj));
+      .then((obj) => this.mapearDetalhesFilme(obj))
   }
 
-  selecionarTrailersPorId(id: number): Promise<TrailerFilme> {
-    const url = `https://api.themoviedb.org/3/movie/${id}`;
+  selecionarTrailersPorId(id: string): Promise<TrailerFilme> {
+    const url = `https://api.themoviedb.org/3/movie/${id}/videos?language=pt-BR`;
 
     return fetch(url, this.obterHeaderAutorizacao())
     .then((res) => this.processarResposta(res))
     .then((obj) => this.mapearTrailersFilme(obj));
+  }
+
+  selecionarCreditosPorId(id: string): Promise<CreditosFilme> {
+    const url = `https://api.themoviedb.org/3/movie/${id}/credits?language=pt-BR`;
+
+    return fetch (url, this.obterHeaderAutorizacao())
+    .then((res) => this.processarResposta(res))
+    .then((obj) => this.mapearCreditosFilme(obj));
   }
 
   private processarResposta(resposta: Response): Promise<any> {
@@ -37,25 +46,45 @@ export class FilmeService {
   }
 
   private mapearDetalhesFilme(obj: any): DetalhesFilme {
-    return obj.map((obj: any) => {
-      return new DetalhesFilme(
-        obj.id,
-        obj.title,
-        obj.overview,
-        obj.release_date,
-        obj.poster_path,
-        obj.backdrop_path,
-        obj.vote_average,
-        obj.vote_count,
-        obj.genres
-      )
-    })
+    console.log(obj.genres);
+    return new DetalhesFilme(
+      obj.id,
+      obj.title,
+      obj.overview,
+      obj.release_date,
+      obj.poster_path,
+      obj.backdrop_path,
+      obj.vote_average,
+      obj.vote_count,
+      obj.genres.map((genero: any) => genero.name),
+    );
   }
 
   private mapearTrailersFilme(obj: any): TrailerFilme {
-    return obj.map((obj: any) => {
+    if (Array.isArray(obj.results) && obj.results.length > 0) {
+      const firstVideo = obj.results[0];
+      return new TrailerFilme(firstVideo.id, firstVideo.key);
+    } else {
+
+      throw new Error('Nenhum vídeo encontrado.');
+    }
+  }
+
+  private mapearCreditosFilme(obj: any): CreditosFilme {
+    if (obj && obj.cast && Array.isArray(obj.cast) && obj.cast.length > 0) {
+      const primeiroCredito = obj.cast[0];
       
-    })
+      return new CreditosFilme(
+        primeiroCredito.order,
+        primeiroCredito.name,
+        primeiroCredito.known_for_department,
+        primeiroCredito.profile_path,
+        primeiroCredito.character
+      );
+    } else {
+
+      throw new Error('Nenhum crédito encontrado.');
+    }
   }
 
   private mapearFilmes(obj: any): ListagemFilme[] {
