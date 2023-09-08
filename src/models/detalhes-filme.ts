@@ -12,6 +12,8 @@ export class DetalhesFilme {
 
   generos: string[];
 
+  readonly urlDetalhes: string;
+
   constructor(id: string, titulo: string, sinopse: string, dataLancamento: string, urlPoster: string,  urlSlide: string, mediaNota: number, contagemVotos: number, generos: string[]) {
     this.id = id;
     this.titulo = titulo;
@@ -22,5 +24,6 @@ export class DetalhesFilme {
     this.mediaNota = mediaNota;
     this.contagemVotos = contagemVotos;
     this.generos = generos;
+    this.urlDetalhes = `detalhes.html?id=${id}`;
   }
 }

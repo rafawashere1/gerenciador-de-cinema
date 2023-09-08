@@ -9,7 +9,7 @@ export class CreditosFilme {
     this.ordem = ordem;
     this.nome = nome;
     this.departamento = departamento;
-    this.caminho_imagem = caminho_imagem;
+    this.caminho_imagem = "https://image.tmdb.org/t/p/original" + caminho_imagem;
     this.personagem = personagem;
   }
 }

@@ -1,10 +1,19 @@
 import { API_KEY } from "../../secrets";
 import { CreditosFilme } from "../models/creditos-filme";
 import { DetalhesFilme } from "../models/detalhes-filme";
+import { IFavoritosFilmes } from "../models/favoritos-filme";
 import { ListagemFilme } from "../models/listagem-filme";
 import { TrailerFilme } from "../models/trailer-filme";
+import { RepositorioFilme } from "./filme-repositorio";
 
 export class FilmeService {
+  private repositorioFilme: RepositorioFilme;
+  public favoritos: IFavoritosFilmes;
+
+  constructor() {
+    this.repositorioFilme = new RepositorioFilme();
+    this.favoritos = this.repositorioFilme.carregarFavoritosSalvos();
+  }
   
   selecionarFilmesPorPopularidade(): Promise<ListagemFilme[]> {
     const url = `https://api.themoviedb.org/3/movie/popular?language=pt-BR&page=1`;
@@ -14,7 +23,19 @@ export class FilmeService {
       .then((obj) => this.mapearFilmes(obj.results));
   }
 
-  selecionarDetalhesFilmePorId(id: string): Promise<DetalhesFilme> {
+  selecionarFilmesFavoritos(ids: string[]): Promise<DetalhesFilme[]> {
+    const promessas = ids.map((id) => {
+      const url = `https://api.themoviedb.org/3/movie/${id}?language=pt-BR`;
+
+      return fetch(url, this.obterHeaderAutorizacao())
+        .then((res) => this.processarResposta(res))
+        .then((obj) => this.mapearDetalhesFilme(obj));
+    });
+
+    return Promise.all(promessas);
+}
+
+  selecionarFilmePorId(id: string): Promise<DetalhesFilme> {
     const url = `https://api.themoviedb.org/3/movie/${id}?language=pt-BR`;
 
     return fetch(url, this.obterHeaderAutorizacao())
@@ -66,7 +87,7 @@ export class FilmeService {
       return new TrailerFilme(firstVideo.id, firstVideo.key);
     } else {
 
-      throw new Error('Nenhum vídeo encontrado.');
+      return new TrailerFilme(obj.id, '');
     }
   }
 
@@ -83,7 +104,7 @@ export class FilmeService {
       );
     } else {
 
-      throw new Error('Nenhum crédito encontrado.');
+      return new CreditosFilme(obj.order, '', '', '', '');
     }
   }
 
