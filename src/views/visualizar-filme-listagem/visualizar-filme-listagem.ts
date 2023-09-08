@@ -1,6 +1,7 @@
 import "bootstrap";
 
 import "./visualizar-filme-listagem.css";
+
 import { FilmeService } from "../../services/filme.service";
 import { ListagemFilme } from "../../models/listagem-filme";
 
